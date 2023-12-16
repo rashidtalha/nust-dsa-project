@@ -6,35 +6,38 @@ from disease import VirusBase
 from community import Community
 from agent import AgentBase
 
+##############################################
+
 class Covid(VirusBase):
-    MAX_SICK_DAYS = 50
-    INFECTION_RADIUS = 0.035**2
-    SYMPTOMS_PROB = 0.70
-    TRANSMISSION_PROB = 0.20
-    QUARANTINE_DELAY = 40
+    MAX_SICK_DAYS = 80
+    INFECTION_RADIUS = 0.04**2
+    SYMPTOMS_PROB = 0.45
+    TRANSMISSION_PROB = 0.50
+    QUARANTINE_DELAY = 30
     DEATH_PROB = 0.15
 
-class Agent(AgentBase):
-    SINK_UPDATE_STEPS = 30
-    MAX_VELOCITY = 0.003
+# class Agent(AgentBase):
+#     SINK_UPDATE_STEPS = 30
+#     MAX_VELOCITY = 0.003
 
 c = Community(Covid("COVID"))
-N, Ni = 200, 1
-c.add_agents(Agent, "H", N)
-c.add_agents(Agent, "S", Ni)
+N, Ni = 300, 1
+c.add_agents(AgentBase, "H", N)
+c.add_agents(AgentBase, "S", Ni)
 
 ##############################################
 
-
-colour = '#f3eeea'
+colour = '#e8e8e8'
 plt.rcParams.update({
     "figure.facecolor":  colour,
     "axes.facecolor":    colour,
-    "savefig.facecolor": colour
+    "savefig.facecolor": colour,
+    "font.family": "monospace",
+    "savefig.dpi": 256
 })
 
-fig = plt.figure(tight_layout=True, figsize=(12.3,5.5))
-gs = fig.add_gridspec(nrows=4, ncols=9)
+fig = plt.figure(tight_layout=True, figsize=(10,5.8))
+gs = fig.add_gridspec(nrows=4, ncols=7)
 
 ax_sim = fig.add_subplot(gs[:, :4])
 pad = 0.035
@@ -42,9 +45,9 @@ ax_sim.set(xlim=(-pad, 1 + pad), ylim=(-pad, 1 + pad), aspect=True)
 ax_sim.set_yticks([])
 ax_sim.set_xticks([])
 
-ax_stack = fig.add_subplot(gs[0:2, 4:])
-ax_stack.set(xlim=(0,1), ylim=(0,100))
-ax_stack.axis(False)
+ax_info = fig.add_subplot(gs[:3, 4:])
+ax_info.set(xlim=(0,2), ylim=(0,2))
+ax_info.axis(False)
 
 ax_qr = fig.add_subplot(gs[3, 4])
 pad = 0.035
@@ -52,12 +55,21 @@ ax_qr.set(xlim=(-pad, 1 + pad), ylim=(-pad, 1 + pad), aspect=True)
 ax_qr.set_yticks([])
 ax_qr.set_xticks([])
 
-ax_info = fig.add_subplot(gs[2:, 6:])
-# ax_info.set_yticks([])
-# ax_info.set_xticks([])
-ax_info.axis(False)
+ax_pk = fig.add_subplot(gs[3, 5:])
+ax_pk.set(xlim=(0,1), ylim=(-0.05,0.80))
+ax_pk.set_yticks([])
+ax_pk.set_xticks([])
 
-ms, mew = 4, 0.5
+ax_pk.axhline(0, lw=0.5, c="#000000")
+ax_pk.axhline(0.25, ls="--", lw=0.5, c="#000000")
+ax_pk.axhline(0.50, ls="--", lw=0.5, c="#000000")
+ax_pk.axhline(0.75, ls="--", lw=0.5, c="#000000")
+ax_pk.axhline(1, lw=0.5, c="#000000")
+
+pk_e, = ax_pk.plot([], [], lw="1.15", c="#a793ac")
+pk_i, = ax_pk.plot([], [], lw="1.15", c="#aa0000")
+
+ms, mew = 6, 0.5
 mec = "#000000"
 gr_h, = ax_sim.plot([], [], ls="", marker="^", ms=ms, mew=mew, mec=mec, c="#44aa00")
 gr_s, = ax_sim.plot([], [], ls="", marker="o", ms=ms, mew=mew, mec=mec, c="#aa0000")
@@ -65,17 +77,37 @@ gr_a, = ax_sim.plot([], [], ls="", marker="o", ms=ms, mew=mew, mec=mec, c="#ffcc
 gr_p, = ax_sim.plot([], [], ls="", marker="o", ms=ms, mew=mew, mec=mec, c="#a793ac")
 gr_d, = ax_sim.plot([], [], ls="", marker="x", ms=ms, mew=2, mec="#3d2b1f", zorder=-5)
 
-ax_qr.text(0, 1.1, f"Quarantine", va="bottom")
-qr_s, = ax_qr.plot([], [], ls="", marker="o", ms=ms, mew=mew, mec=mec, c="#aa0000")
-qr_p, = ax_qr.plot([], [], ls="", marker="o", ms=ms, mew=mew, mec=mec, c="#a793ac")
+ms, mew = 4, 0.5
+qr_s, = ax_qr.plot([], [], ls="", marker="o", ms=ms, mew=mew, c="#aa0000")
+qr_p, = ax_qr.plot([], [], ls="", marker="o", ms=ms, mew=mew, c="#a793ac")
 qr_d, = ax_qr.plot([], [], ls="", marker="x", ms=ms, mew=2, mec="#3d2b1f", zorder=-5)
 
-hist = {"I":[], "RI":[]}
 
-t = ax_info.text(0.1, 0.1, f"", va="bottom")
+ax_info.text(1, 1.85, f"(Model: Stochastic SIR)", va="top")
+
+t_days = ax_info.text(0, 1.85, f"Day: 0", va="top")
+
+t_h = ax_info.text(0, 1.65, f"Healthy: {c.count['H']} ({c.count['H']/c.num:.2%})", va="top")
+t_s = ax_info.text(0, 1.55, f"Sympomatic: {c.count['S']} ({c.count['S']/c.num:.2%})", va="top")
+t_a = ax_info.text(0, 1.45, f"Asymptomatic: {c.count['A']} ({c.count['A']/c.num:.2%})", va="top")
+t_r = ax_info.text(0, 1.35, f"Recovered: {c.count['P']} ({c.count['P']/c.num:.2%})", va="top")
+t_d = ax_info.text(0, 1.25, f"Dead: {c.count['D']} ({c.count['D']/c.num:.2%})", va="top")
+
+t_q = ax_info.text(0, 1.05, f"Quarantined: {len([0 for a in c.agents if a.quarantine])}", va="top")
+
+ax_info.text(0, 0.85, f"Infection Probability: {c.virus.TRANSMISSION_PROB:.2f}", va="top")
+ax_info.text(0, 0.75, f"Asymptomatic Probability: {1-c.virus.SYMPTOMS_PROB:.2f}", va="top")
+ax_info.text(0, 0.65, f"Mortality Probability: {c.virus.DEATH_PROB:.2f}", va="top")
+
+ax_info.text(0, 0.55, f"Quarantine Delay: {c.virus.QUARANTINE_DELAY} days", va="top")
+ax_info.text(0, 0.45, f"Maximum Infection Duration: {c.virus.MAX_SICK_DAYS} days", va="top")
+ax_info.text(0, 0.35, f"Tranmission Radius: {c.virus.INFECTION_RADIUS:.2e}", va="top")
+
+ax_info.text(0, 0.15, f"Allow Immunity Loss: {c.virus.IMMUNITY_LOSS}", va="top")
+
+hist_infected, hist_ever = [], []
 
 def updater(k):
-    print(c.count["S"], c.count["A"])
     gr_h.set_data(c.get_xy("H", False))
     gr_s.set_data(c.get_xy("S", False))
     gr_a.set_data(c.get_xy("A", False))
@@ -85,27 +117,34 @@ def updater(k):
     qr_s.set_data(c.get_xy("S", True))
     qr_p.set_data(c.get_xy("P", True))
     qr_d.set_data(c.get_xy("D", True))
+
+    hist_infected.append( (c.count["S"] + c.count["A"]) / c.num )
+    hist_ever.append( (c.count["S"] + c.count["A"] + c.count["P"] + c.count["D"]) / c.num )
+
+    x_pk = np.arange(len(hist_infected))
+    
+    pk_i.set_data(x_pk, hist_infected)
+    pk_e.set_data(x_pk, hist_ever)
+
+    ax_pk.set(xlim=(0,len(hist_infected)))
     
     c.evolve()
 
-    hist["I"].append( 100 * (c.count["S"] + c.count["A"]) / c.num )
-    hist["RI"].append( 100 * (c.count["S"] + c.count["A"] + c.count["P"] + c.count["D"]) / c.num )
-
-    nth = 2
+    nth = 4
     if k%nth == 0:
-        xstack = np.arange(len(hist["I"]))
-        ax_stack.fill_between(xstack, 100+np.zeros_like(xstack), color="#44aa00")
-        ax_stack.fill_between(xstack, hist["RI"], color="#a793ac")
-        ax_stack.fill_between(xstack, hist["I"], color="#aa0000")
-        ax_stack.set(xlim=(0, max(1, k-1)))
         L = k//nth
-        if k%(2*nth) == 0:
-            t.set_text(f"Day: {L//2}")
+        t_days.set_text(f"Day: {L}")
 
-s = c.sim_counter()
-ani = anim.FuncAnimation(fig, updater, frames=s, interval=40, repeat=False, cache_frame_data=True)
-# writer = anim.FFMpegWriter(fps=1000/33)
-# ani.save("output.mp4", writer=writer)
+        t_h.set_text(f"Healthy: {c.count['H']} ({c.count['H']/c.num:.2%})")
+        t_s.set_text(f"Sympomatic: {c.count['S']} ({c.count['S']/c.num:.2%})")
+        t_a.set_text(f"Asymptomatic: {c.count['A']} ({c.count['A']/c.num:.2%})")
+        t_r.set_text(f"Recovered: {c.count['P']} ({c.count['P']/c.num:.2%})")
+        t_d.set_text(f"Dead: {c.count['D']} ({c.count['D']/c.num:.2%})")
+        t_q.set_text(f"Quarantined: {len([0 for a in c.agents if a.quarantine])}")
+
+s = c.sim_counter
+ani = anim.FuncAnimation(fig, updater, frames=s, interval=40, repeat=False, cache_frame_data=False)
+writer = anim.FFMpegWriter(fps=1000/33)
+ani.save("output.mp4", writer=writer)
 
 plt.show()
-print("Here")
