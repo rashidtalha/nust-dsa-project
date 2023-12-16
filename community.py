@@ -34,13 +34,13 @@ class Community():
         x, y = bucket.T
         return x, y
 
-    def sim_counter(self, max_steps=500):
+    def sim_counter(self, max_steps=800):
         n = 0
         while (self.count["S"] + self.count["A"]) > 0:
             yield n + 1
             n += 1
-            # if n == max_steps:
-                # break
+            if n == max_steps:
+                break
         yield n + 1
 
     def evolve(self):
@@ -52,7 +52,9 @@ class Community():
 
         # (S/A) to (D/P):
         curr_inf_all = [a for a in self.agents if a.state in ("A", "S")]
-        if len(curr_inf_all) == 0: return
+        if len(curr_inf_all) == 0:
+            self.count["S"], self.count["A"] = 0, 0
+            return
         
         for a in curr_inf_all:
             a.days_infected += 1

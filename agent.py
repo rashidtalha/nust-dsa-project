@@ -26,6 +26,9 @@ class AgentBase():
         if self.state == "D":
             return
 
+        if self.quarantine == True:
+            return
+
         while True:
             dist = np.sqrt(np.sum((self.s - self.p)**2))
             acc = self.ACC_FACTOR * (self.s - self.p) / dist
@@ -45,7 +48,6 @@ class AgentBase():
 
     def set_state(self, new_state):
         self.state = new_state
-        self.radius = 0
         self.days_infected = 0
 
     def set_quarantine(self, new_state=True):
