@@ -26,7 +26,7 @@ class AgentBase():
         if self.state == "D":
             return
 
-        if self.quarantine == True:
+        if self.quarantine is True:
             return
 
         while True:

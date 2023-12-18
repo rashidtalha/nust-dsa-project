@@ -12,7 +12,7 @@ plt.rcParams.update({
 })
 
 def run_simulation(c, save_to_disk=False, fn="output"):
-    fig = plt.figure(tight_layout=True, figsize=(12,7.2))
+    fig = plt.figure(tight_layout=True, figsize=(12,7.3))
     gs = fig.add_gridspec(nrows=4, ncols=7)
     pad = 0.035
 
@@ -66,9 +66,9 @@ def run_simulation(c, save_to_disk=False, fn="output"):
     ax_info = fig.add_subplot(gs[:3, 4:])
     ax_info.set(xlim=(0,2), ylim=(0,2))
     ax_info.axis(False)
-    ax_info.text(1, 1.85, f"(Model: Stochastic SIR)", va="top")
+    ax_info.text(2, 1.85, "(Model: Stochastic SIR)", va="top", ha="right")
 
-    t_days = ax_info.text(0, 1.85, f"Day: 0", va="top")
+    t_days = ax_info.text(0, 1.85, "Day: 0", va="top")
 
     t_h = ax_info.text(0, 1.65, f"Healthy: {c.count['H']} ({c.count['H']/c.num:.2%})", va="top")
     t_s = ax_info.text(0, 1.55, f"Symptomatic: {c.count['S']} ({c.count['S']/c.num:.2%})", va="top")

@@ -5,7 +5,7 @@ from simulator import run_simulation
 
 ##############################################
 
-class Covid(VirusBase):
+class Virus(VirusBase):
     MAX_SICK_DAYS = 80
     INFECTION_RADIUS = 0.04**2
     SYMPTOMS_PROB = 0.45
@@ -13,8 +13,9 @@ class Covid(VirusBase):
     QUARANTINE_DELAY = 30
     DEATH_PROB = 0.15
 
-c = Community(Covid("COVID"))
 N, Ni = 300, 1
+
+c = Community(Virus("COVID"))
 c.add_agents(AgentBase, "H", N)
 c.add_agents(AgentBase, "S", Ni)
 

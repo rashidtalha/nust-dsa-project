@@ -46,7 +46,7 @@ class Community():
     def evolve(self):
         if self.virus.QUARANTINE_DELAY >= 0:
             for a in self.agents:
-                if (a.state == "S") and (a.quarantine == False):
+                if (a.state == "S") and (a.quarantine is False):
                     if a.days_infected >= self.virus.QUARANTINE_DELAY:
                         a.set_quarantine(True)
 
@@ -71,7 +71,7 @@ class Community():
         curr_inf, curr_sus = [], []
         curr_inf_loc, curr_sus_loc = [], []
         for a in self.agents:
-            if a.quarantine == False:
+            if a.quarantine is False:
                 if (a.state in ("A", "S")):
                     curr_inf.append(a)
                     curr_inf_loc.append(a.p)
