@@ -29,3 +29,7 @@ python main.py
 
 By default a live simulation is played. The user can alternatively save it to the file by passing `save_to_disk=True` as an argument to the `run_simulation` function inside the main script.
 
+### Examples.
+
+**Screenshots:**
+![Simulating an epidemic](examples/out_1.png "Simulating an epidemic: Sample output")
