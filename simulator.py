@@ -115,7 +115,7 @@ def run_simulation(c, save_to_disk=False, fn="output"):
     ax_info.text(0, 0.65, f"Mortality Probability: {c.virus.DEATH_PROB:.2f}", va="top")
     ax_info.text(0, 0.55, f"Quarantine Delay: {c.virus.QUARANTINE_DELAY} days", va="top")
     ax_info.text(0, 0.45, f"Maximum Infection Duration: {c.virus.MAX_SICK_DAYS} days", va="top")
-    ax_info.text(0, 0.35, f"Tranmission Radius: {c.virus.INFECTION_RADIUS:.2e}", va="top")
+    ax_info.text(0, 0.35, f"Transmission Radius: {c.virus.INFECTION_RADIUS:.2e}", va="top")
     ax_info.text(0, 0.15, f"Allow Immunity Loss: {c.virus.IMMUNITY_LOSS}", va="top")
 
     def updater(k):
@@ -150,7 +150,7 @@ def run_simulation(c, save_to_disk=False, fn="output"):
             L = k//nth
             t_t.set_text(f"Day: {L}")
             t_h.set_text(f"Healthy: {c.count['H']} ({c.count['H']/c.num:.2%})")
-            t_s.set_text(f"Sympomatic: {c.count['S']} ({c.count['S']/c.num:.2%})")
+            t_s.set_text(f"Symptomatic: {c.count['S']} ({c.count['S']/c.num:.2%})")
             t_a.set_text(f"Asymptomatic: {c.count['A']} ({c.count['A']/c.num:.2%})")
             t_r.set_text(f"Recovered: {c.count['P']} ({c.count['P']/c.num:.2%})")
             t_d.set_text(f"Dead: {c.count['D']} ({c.count['D']/c.num:.2%})")
